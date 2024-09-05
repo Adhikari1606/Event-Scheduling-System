@@ -1,9 +1,10 @@
 const express = require('express');
-const { scheduleSession, getSessions } = require('../controllers/sessionController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { scheduleSession, getSession } = require('../controllers/sessionController');
+const authMiddleware = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
-router.post('/', protect, admin, scheduleSession); 
-router.get('/', protect, getSessions);
+router.post('/', authMiddleware, scheduleSession);
+router.get('/', authMiddleware, getSession);
 
 module.exports = router;

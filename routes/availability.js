@@ -1,9 +1,10 @@
 const express = require('express');
 const { addAvailability, getAvailability } = require('../controllers/availabilityController');
-const { protect } = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
-router.post('/', protect, addAvailability);
-router.get('/', protect, getAvailability);
+router.post('/', authMiddleware, addAvailability);
+router.get('/', authMiddleware, getAvailability);
 
 module.exports = router;

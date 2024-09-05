@@ -1,27 +1,20 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
-// Register a new user
+// Register user
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
 
   try {
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create a new user
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({ name, email, password: hashedPassword, role });
     await user.save();
-
-    // Respond with success message
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -32,38 +25,68 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please provide email and password' });
+  }
+
   try {
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Create and send JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate token (assuming you have a function for this)
+    const token = generateToken(user._id);
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
 
-// Get user profile
-const getUserProfile = async (req, res) => {
+// Update availability
+const updateAvailability = async (req, res) => {
+  const { userId, availability } = req.body;
+
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+
+    user.availability = availability;
+    await user.save();
+    res.json({ message: 'Availability updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+// Update schedule
+const updateSchedule = async (req, res) => {
+  const { userId, schedule } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.schedule = schedule;
+    await user.save();
+    res.json({ message: 'Schedule updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  updateAvailability,
+  updateSchedule
+};

@@ -1,9 +1,17 @@
 const mongoose = require('mongoose');
-const AvailabilitySchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  day: { type: String, required: true },
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
-  recurring: { type: Boolean, default: false }
+
+const availabilitySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  availableTimes: {
+    type: [String], 
+    required: true,
+  },
 });
-module.exports = mongoose.model('Availability', AvailabilitySchema);
+
+const Availability = mongoose.model('Availability', availabilitySchema);
+
+module.exports = Availability;

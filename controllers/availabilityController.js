@@ -2,18 +2,12 @@ const Availability = require('../models/Availability');
 
 // Add availability
 const addAvailability = async (req, res) => {
-  const { day, startTime, endTime, recurring } = req.body;
+  const { userId, availableTimes } = req.body;
 
   try {
-    const availability = new Availability({
-      user: req.user._id,
-      day,
-      startTime,
-      endTime,
-      recurring,
-    });
+    const availability = new Availability({ userId, availableTimes });
     await availability.save();
-    res.status(201).json(availability);
+    res.status(201).json({ message: 'Availability added successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
@@ -22,7 +16,7 @@ const addAvailability = async (req, res) => {
 // Get availability
 const getAvailability = async (req, res) => {
   try {
-    const availability = await Availability.find({ user: req.user._id });
+    const availability = await Availability.find({ userId: req.user._id });
     res.json(availability);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
