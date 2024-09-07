@@ -1,4 +1,4 @@
-const Session = require('../Server/models/Session');
+const Session = require('../models/Session');
 
 // Schedule a session
 const scheduleSession = async (req, res) => {

@@ -1,4 +1,4 @@
-const Availability = require('../Server/models/Availability');
+const Availability = require('../models/Availability');
 
 // Add availability
 const addAvailability = async (req, res) => {
